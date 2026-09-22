@@ -113,34 +113,81 @@ impl raquette {
 	fn update(&mut self) {
 		let (mut mouse_x, mut mouse_y) = mouse_position();
 		if self.pl_ctrl {
-			self.y = mouse_y;
+			self.y = mouse_y - 22.0;
 		}
 	}
 	
 	fn set_y(&mut self, dat: f32) {
 		self.y = dat;
 	}
+
+	fn get_y(&self) -> f32 {
+		return self.y;
+	}
 }
 
 struct ball {
 	x: f32,
 	y: f32,
+	lim_haut: f32,
+	lim_bas: f32,
+	lim_droite: f32,
+	lim_gauche: f32,
+	hitbox_y_droite: f32,
+	hitbox_y_gauche: f32,
 }
 
 impl ball {
-	fn new(x: f32, y: f32) -> Self {
+	/*
+	les fonction set hitbox servent a definir la position de la rackette pour detecter la hitbox a la bonne hauteur
+
+	
+	 */
+	fn new(x: f32, y: f32, lim_haut: f32, lim_bas: f32, lim_droite: f32, lim_gauche: f32) -> Self {
+		/*
+		x, y position initial de la balle
+
+		les lims sont les limites (hit box) du terrais
+		les limites gauche et droites seront complémenté par la taille de la raquette (tkt jespere ca marche)
+		
+		 */
 		Self {
 			x,
 			y,
+			lim_haut,
+			lim_bas,
+			lim_gauche,
+			lim_droite,
+			hitbox_y_droite: 0.0,
+			hitbox_y_gauche: 0.0,
 		}
 	}
 	
 	fn draw(&self) {
 		draw_circle(self.x, self.y, 15.0, YELLOW);
 	}
+
+	fn set_hitbox_y_droite(&mut self, pos_y: f32) {
+		self.hitbox_y_droite = pos_y;
+	}
+
+	fn set_hitbox_y_gauche(&mut self, pos_y: f32) {
+		self.hitbox_y_gauche = pos_y;
+	}
 }
 
 
+/*
+
+DESCRIPTION SCENE
+
+scene 0 : error code
+scene 1 : non utilisée
+scene 2 : main menu
+scene 3 : jeux
+
+
+*/
 
 
 
@@ -179,7 +226,7 @@ async fn main() {
 	let p1_score: i32 = 0;
 	let p2_score: i32 = 0;
 	
-	let mut ball1 = ball::new(400.0, 300.0);
+	//let mut ball1 = ball::new(400.0, 300.0);
 	
 	
     loop {
@@ -251,7 +298,7 @@ async fn main() {
 			r2.draw();
 			
 			//ball
-			ball1.draw();
+			//ball1.draw();
 			
 			
 		}
