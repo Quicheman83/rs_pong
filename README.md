@@ -36,7 +36,7 @@ cargo run --release
 - [ ] Ajustements de la physique de la balle
 - [ ] Menu / options de configuration
 - [ ] Mode multijoueur en réseau (à évaluer)
-- [~] support modulaire du moteur (support rudimentaire)
+- [ ] support modulaire du moteur (support rudimentaire)
 
 ## Contribuer
 
