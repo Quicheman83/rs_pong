@@ -129,12 +129,10 @@ impl raquette {
 struct ball {
 	x: f32,
 	y: f32,
-	lim_haut: f32,
-	lim_bas: f32,
-	lim_droite: f32,
-	lim_gauche: f32,
 	hitbox_y_droite: f32,
 	hitbox_y_gauche: f32,
+	vel_x: f32,
+	vel_y: f32,
 }
 
 impl ball {
@@ -143,23 +141,21 @@ impl ball {
 
 	
 	 */
-	fn new(x: f32, y: f32, lim_haut: f32, lim_bas: f32, lim_droite: f32, lim_gauche: f32) -> Self {
+	fn new(x: f32, y: f32) -> Self {
 		/*
 		x, y position initial de la balle
 
 		les lims sont les limites (hit box) du terrais
-		les limites gauche et droites seront complémenté par la taille de la raquette (tkt jespere ca marche)
+		les limites gauche et droites seront complémenté par la hauteur de la raquette (tkt jespere ca marche)
 		
 		 */
 		Self {
 			x,
 			y,
-			lim_haut,
-			lim_bas,
-			lim_gauche,
-			lim_droite,
 			hitbox_y_droite: 0.0,
 			hitbox_y_gauche: 0.0,
+			vel_x: 1.0,
+			vel_y: 1.0,
 		}
 	}
 	
@@ -173,6 +169,36 @@ impl ball {
 
 	fn set_hitbox_y_gauche(&mut self, pos_y: f32) {
 		self.hitbox_y_gauche = pos_y;
+	}
+
+	fn get_y(&mut self) -> f32 {
+		return self.y;
+	}
+
+	fn get_x(&mut self) -> f32 {
+		return self.x;
+	}
+
+	fn update(&mut self) {
+		if self.y <= 45.0 {
+			self.vel_y = self.vel_y * -1.0;
+		}
+		if self.y >= 555.0 {
+			self.vel_y = self.vel_y * -1.0;
+		}
+
+		if self.x <= 41.0 && self.y > self.hitbox_y_gauche && self.y < self.hitbox_y_gauche + 45.0 {
+			self.vel_x = self.vel_x * -1.0;
+		}
+
+		if self.x >= 744.0 {
+			self.vel_x = self.vel_x * -1.0;
+		}
+
+
+		self.x = self.x + self.vel_x;
+		self.y = self.y + self.vel_y;
+
 	}
 }
 
@@ -196,9 +222,14 @@ async fn main() {
 	//draw_line(140.0, 40.0, 400.0, 200.0, 15.0, BLUE);
 	
 	//vars
+
+	let mut ballx: f32 = 0.0;
+	let mut bally: f32 = 0.0;
+
 	//let mut scene: i32 = 2;
 	let mut scene: i32 = 2;
 	let (mut mouse_x, mut mouse_y) = mouse_position();
+	let dbg_overlay: bool = true;
 	
 	//scene 2 moving txt data
 	let m_txt_1_speed: f32 = 0.8;
@@ -226,13 +257,14 @@ async fn main() {
 	let p1_score: i32 = 0;
 	let p2_score: i32 = 0;
 	
-	//let mut ball1 = ball::new(400.0, 300.0);
+	let mut ball1 = ball::new(400.0, 300.0);
 	
 	
     loop {
 		//code commun
 		(mouse_x, mouse_y) = mouse_position();
-		
+
+
 		//scenes
 		if scene == 2 {
 			clear_background(BLACK);
@@ -249,9 +281,9 @@ async fn main() {
 			
 			//btn handle
 			if btn_1.isClicked() {
-				error_msg = String::from("non disponible (WIP)");
-				scene = 0;
-				//scene = 3;
+				//error_msg = String::from("non disponible (WIP)");
+				//scene = 0;
+				scene = 3;
 			}
 			
 			/*
@@ -278,6 +310,7 @@ async fn main() {
 			
 			m_txt_1_x = m_txt_1_x + m_txt_1_x_vel;
 			m_txt_1_y = m_txt_1_y + m_txt_1_y_vel;
+
 			
 			
 		}
@@ -287,7 +320,7 @@ async fn main() {
 			clear_background(BLACK);
 			
 			//terrain
-			draw_rectangle(0.0, 0.0, 800.0, 30.0, WHITE);
+			//draw_rectangle(0.0, 0.0, 800.0, 30.0, WHITE);
 			draw_rectangle(0.0, 570.0, 800.0, 30.0, WHITE);
 			
 			//raquette 1 
@@ -298,7 +331,19 @@ async fn main() {
 			r2.draw();
 			
 			//ball
-			//ball1.draw();
+			ball1.update();
+			ball1.draw();
+
+			//la raquette 2 copie la hauteur de la balle
+			r2.set_y(ball1.get_y() - 15.0);
+
+			//la balle capture la posistion de la raquette pour calculer les hitbox
+			ball1.set_hitbox_y_gauche(r1.get_y());
+
+
+			ballx = ball1.get_x();
+			bally = ball1.get_y();
+
 			
 			
 		}
@@ -319,6 +364,17 @@ async fn main() {
 			}
 			
 		}
+
+		//overlays
+		if dbg_overlay {
+			draw_text(format!("=== DEBUG ==="), 5.0, 10.0, 15.0, GREEN);
+			draw_text(format!("mouse x : {mouse_x}"), 5.0, 20.0, 15.0, GREEN);
+			draw_text(format!("mouse y : {mouse_y}"), 5.0, 30.0, 15.0, GREEN);
+			draw_text(format!("current scene : {scene}"), 5.0, 40.0, 15.0, GREEN);
+			draw_text(format!("ball x : {ballx}"), 5.0, 50.0, 15.0, GREEN);
+			draw_text(format!("ball y : {bally}"), 5.0, 60.0, 15.0, GREEN);
+		}
+
 		
         next_frame().await
     }
