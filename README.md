@@ -1,4 +1,4 @@
-# Pong (Rust)
+# RS_Pong
 
 Une implémentation du jeu classique **Pong**, écrite en Rust.
 
