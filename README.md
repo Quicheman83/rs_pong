@@ -33,9 +33,9 @@ cargo run --release
 ## Roadmap
 
 - [ ] Support des écrans 60 Hz
-- [ ] Ajustements de la physique de la balle (La balle a pas encore de physique LOL)
+- [x] Ajustements de la physique de la balle
 - [ ] Menu / options de configuration
-- [ ] Mode multijoueur en réseau (à évaluer)
+- [ ] Mode multijoueur en réseau (impossible avec le moteur actuel)
 - [ ] support modulaire du moteur (support rudimentaire)
 
 ## Contribuer
