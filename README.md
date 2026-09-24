@@ -9,7 +9,7 @@ Une implémentation du jeu classique **Pong**, écrite en Rust.
 - Le jeu ne fonctionne correctement que sur les écrans à **144 Hz**.
 - Le support des écrans autre que **144 Hz** est disponible mais peut etre instable.
 
-N'hésitez pas à signaler tout bug ou comportement inattendu, surtout si vous testez sur une configuration différente de 120 Hz.
+N'hésitez pas à signaler tout bug ou comportement inattendu, surtout si vous testez sur une configuration différente de 144 Hz.
 
 ## Installation
 
