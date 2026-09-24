@@ -133,6 +133,7 @@ struct ball {
 	hitbox_y_gauche: f32,
 	vel_x: f32,
 	vel_y: f32,
+	dt: f32,
 }
 
 impl ball {
@@ -156,9 +157,10 @@ impl ball {
 			hitbox_y_gauche: 0.0,
 			vel_x: 1.0,
 			vel_y: 1.0,
+			dt: 0.0,
 		}
 	}
-	
+
 	fn draw(&self) {
 		draw_circle(self.x, self.y, 15.0, YELLOW);
 	}
@@ -179,7 +181,18 @@ impl ball {
 		return self.x;
 	}
 
-	fn update(&mut self) {
+	fn set_pos(&mut self, x: f32, y: f32) {
+		self.x = x;
+		self.y = y;
+	}
+
+
+	fn update(&mut self, spd_adj: f32) {
+		/*
+		
+		spd adj est le facteur pour ajuster la vitesse selon le framerate
+		
+		 */
 		if self.y <= 45.0 {
 			self.vel_y = self.vel_y * -1.0;
 		}
@@ -196,9 +209,13 @@ impl ball {
 		}
 
 
-		self.x = self.x + self.vel_x;
-		self.y = self.y + self.vel_y;
+		self.x = self.x + self.vel_x * spd_adj;
+		self.y = self.y + self.vel_y * spd_adj;
+	
+	}
 
+	fn set_dt(&mut self, dt: f32) {
+		self.dt = dt;
 	}
 }
 
@@ -211,6 +228,7 @@ scene 0 : error code
 scene 1 : non utilisée
 scene 2 : main menu
 scene 3 : jeux
+scene 4 : settings
 
 
 */
@@ -223,6 +241,12 @@ async fn main() {
 	
 	//vars
 
+	//delta time
+	let mut dt: f32 = 0.0;
+	let mut fps: f32 = 60.0;
+	let mut speed_adjustement: f32 = 144.0 / fps;
+
+	//dbg vars
 	let mut ballx: f32 = 0.0;
 	let mut bally: f32 = 0.0;
 
@@ -263,6 +287,9 @@ async fn main() {
     loop {
 		//code commun
 		(mouse_x, mouse_y) = mouse_position();
+		dt = get_frame_time();
+		fps = 1.0 / dt;
+		let mut speed_adjustement: f32 = 144.0 / fps;
 
 
 		//scenes
@@ -308,8 +335,8 @@ async fn main() {
 				m_txt_1_x_vel = m_txt_1_x_vel * -1.0;
 			}
 			
-			m_txt_1_x = m_txt_1_x + m_txt_1_x_vel;
-			m_txt_1_y = m_txt_1_y + m_txt_1_y_vel;
+			m_txt_1_x = m_txt_1_x + m_txt_1_x_vel * speed_adjustement;
+			m_txt_1_y = m_txt_1_y + m_txt_1_y_vel * speed_adjustement;
 
 			
 			
@@ -320,7 +347,7 @@ async fn main() {
 			clear_background(BLACK);
 			
 			//terrain
-			//draw_rectangle(0.0, 0.0, 800.0, 30.0, WHITE);
+			draw_rectangle(0.0, 0.0, 800.0, 30.0, WHITE);
 			draw_rectangle(0.0, 570.0, 800.0, 30.0, WHITE);
 			
 			//raquette 1 
@@ -331,7 +358,7 @@ async fn main() {
 			r2.draw();
 			
 			//ball
-			ball1.update();
+			ball1.update(speed_adjustement);
 			ball1.draw();
 
 			//la raquette 2 copie la hauteur de la balle
@@ -340,7 +367,14 @@ async fn main() {
 			//la balle capture la posistion de la raquette pour calculer les hitbox
 			ball1.set_hitbox_y_gauche(r1.get_y());
 
+			//si perdu retour au main menu
+			if ball1.get_x() < 10.0 {
+				ball1.set_pos(400.0, 300.0);
+				scene = 2;
+			}
 
+
+			//dbg vars
 			ballx = ball1.get_x();
 			bally = ball1.get_y();
 
@@ -348,7 +382,17 @@ async fn main() {
 			
 		}
 		
-		
+		if scene == 4 {
+
+			//settings
+
+			//text a mettre en rgb
+			draw_text(String::from("=== SETTINGS ==="), 255.0, 45.0, 40.0, WHITE);
+
+
+
+
+		}
 		
 		
 		if scene == 0 {
@@ -373,6 +417,9 @@ async fn main() {
 			draw_text(format!("current scene : {scene}"), 5.0, 40.0, 15.0, GREEN);
 			draw_text(format!("ball x : {ballx}"), 5.0, 50.0, 15.0, GREEN);
 			draw_text(format!("ball y : {bally}"), 5.0, 60.0, 15.0, GREEN);
+			draw_text(format!("frame delta time : {dt}"), 5.0, 70.0, 15.0, GREEN);
+			draw_text(format!("FPS : {fps}"), 5.0, 80.0, 15.0, GREEN);
+			draw_text(format!("SPD_ADJ : {speed_adjustement}"), 5.0, 90.0, 15.0, GREEN);
 		}
 
 		
